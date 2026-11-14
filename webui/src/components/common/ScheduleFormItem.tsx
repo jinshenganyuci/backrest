@@ -10,6 +10,7 @@ import {
 } from "../../../gen/ts/v1/config_pb";
 import cronstrue from "cronstrue";
 import "cronstrue/locales/zh_CN";
+// @ts-ignore -- Paraglide generates runtime.js without a declaration file.
 import { getLocale } from "../../paraglide/runtime";
 import * as m from "../../paraglide/messages";
 
