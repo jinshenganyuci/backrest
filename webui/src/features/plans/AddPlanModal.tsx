@@ -194,7 +194,7 @@ export const AddPlanModal = ({
         !(formData.retention.policyTimeBucketed.keepLastN > 1)
       ) {
         throw new Error(
-          "Your schedule runs more than once per hour; please specify a 'Latest (Count)' greater than 1 in Retention Policy.",
+          m.plan_frequent_retention_validation(),
         );
       }
 
@@ -223,7 +223,7 @@ export const AddPlanModal = ({
 
       if (template) {
         const idx = configCopy.plans.findIndex((r) => r.id === template.id);
-        if (idx === -1) throw new Error("failed to update plan, not found");
+        if (idx === -1) throw new Error(m.plan_update_not_found());
         configCopy.plans[idx] = plan;
       } else {
         configCopy.plans.push(plan);
@@ -247,18 +247,18 @@ export const AddPlanModal = ({
     items: [
       ...localRepos.map((r) => ({ label: r.id, value: r.id })),
       ...remoteRepos.map((r) => ({
-        label: `${r.id} (from ${r.originInstanceId})`,
+        label: m.plan_remote_repo_label({ repo: r.id, instance: r.originInstanceId }),
         value: r.id,
       })),
     ],
   });
 
   const sections: SectionDef[] = [
-    { id: "details", label: "Details", icon: <FiFileText size={14} /> },
-    { id: "scope", label: "Scope", icon: <FiFolder size={14} /> },
-    { id: "schedule", label: "Schedule", icon: <FiClock size={14} /> },
-    { id: "retention", label: "Retention", icon: <FiArchive size={14} /> },
-    { id: "advanced", label: "Advanced", icon: <FiSliders size={14} /> },
+    { id: "details", label: m.ui_details(), icon: <FiFileText size={14} /> },
+    { id: "scope", label: m.ui_scope(), icon: <FiFolder size={14} /> },
+    { id: "schedule", label: m.ui_schedule(), icon: <FiClock size={14} /> },
+    { id: "retention", label: m.ui_retention(), icon: <FiArchive size={14} /> },
+    { id: "advanced", label: m.ui_advanced(), icon: <FiSliders size={14} /> },
   ];
 
   const footer = (
@@ -307,7 +307,7 @@ export const AddPlanModal = ({
         <SectionCard
           icon={<FiFileText size={16} />}
           title={m.op_row_backup_details()}
-          description="Plan name and target repository."
+          description={m.plan_details_description()}
         >
           <Stack gap={4}>
             <Field
@@ -366,7 +366,7 @@ export const AddPlanModal = ({
                       px={2}
                       py={1}
                     >
-                      Local
+                      {m.ui_local()}
                     </CText>
                   )}
                   {repoOptions.items
@@ -387,7 +387,7 @@ export const AddPlanModal = ({
                       borderTopWidth="1px"
                       borderColor="border"
                     >
-                      Remote
+                      {m.ui_remote()}
                     </CText>
                   )}
                   {repoOptions.items
@@ -408,8 +408,8 @@ export const AddPlanModal = ({
       <TwoPaneSection id="scope">
         <SectionCard
           icon={<FiFolder size={16} />}
-          title={m.settings_peer_permission_scopes()}
-          description="Directories and exclusion patterns."
+          title={m.ui_scope()}
+          description={m.plan_scope_description()}
         >
           <Stack gap={4}>
             <DynamicList
@@ -471,7 +471,7 @@ export const AddPlanModal = ({
         <SectionCard
           icon={<FiClock size={16} />}
           title={m.add_plan_modal_field_schedule()}
-          description="When backups run automatically."
+          description={m.plan_schedule_description()}
         >
           <ScheduleFormItem
             value={getField(["schedule"])}
@@ -486,7 +486,7 @@ export const AddPlanModal = ({
         <SectionCard
           icon={<FiArchive size={16} />}
           title={m.add_plan_modal_retention_policy_label()}
-          description="How long to keep snapshots before forgetting them."
+          description={m.plan_retention_description()}
         >
           {repoHasScheduledForget ? (
             <CText color="fg.muted" fontStyle="italic">
@@ -507,7 +507,7 @@ export const AddPlanModal = ({
         <SectionCard
           icon={<FiSliders size={16} />}
           title={m.add_plan_modal_advanced_label()}
-          description="Extra flags and notification hooks."
+          description={m.plan_advanced_description()}
         >
           <Stack gap={4}>
             <DynamicList

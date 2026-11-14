@@ -1,3 +1,4 @@
+import * as m from "../../paraglide/messages";
 import {
   Pagination as ChakraPagination,
   IconButton,
@@ -30,7 +31,7 @@ export const PaginationPrevTrigger = React.forwardRef<
   return (
     // @ts-ignore
     <ChakraPagination.PrevTrigger {...props} asChild ref={ref}>
-      <IconButton variant="ghost" aria-label="Previous Page" size="sm">
+      <IconButton variant="ghost" aria-label={m.ui_previous_page()} size="sm">
         <FiChevronLeft />
       </IconButton>
     </ChakraPagination.PrevTrigger>
@@ -44,7 +45,7 @@ export const PaginationNextTrigger = React.forwardRef<
   return (
     // @ts-ignore
     <ChakraPagination.NextTrigger {...props} asChild ref={ref}>
-      <IconButton variant="ghost" aria-label="Next Page" size="sm">
+      <IconButton variant="ghost" aria-label={m.ui_next_page()} size="sm">
         <FiChevronRight />
       </IconButton>
     </ChakraPagination.NextTrigger>

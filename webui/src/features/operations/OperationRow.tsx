@@ -433,7 +433,7 @@ export const OperationRow = ({
                 <IconButton
                   variant="ghost"
                   size="sm"
-                  aria-label="Actions"
+                  aria-label={m.ui_actions()}
                   data-testid="operation-row-actions"
                 >
                   <FiMoreVertical />

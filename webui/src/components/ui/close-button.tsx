@@ -1,3 +1,4 @@
+import * as m from "../../paraglide/messages";
 import type { ButtonProps } from "@chakra-ui/react";
 import { IconButton as ChakraIconButton } from "@chakra-ui/react";
 import { FiX } from "react-icons/fi";
@@ -10,7 +11,7 @@ export const CloseButton = React.forwardRef<
   CloseButtonProps
 >(function CloseButton(props, ref) {
   return (
-    <ChakraIconButton variant="ghost" aria-label="Close" ref={ref} {...props}>
+    <ChakraIconButton variant="ghost" aria-label={m.ui_close()} ref={ref} {...props}>
       <FiX />
     </ChakraIconButton>
   );

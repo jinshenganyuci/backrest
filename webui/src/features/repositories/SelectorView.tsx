@@ -1,3 +1,4 @@
+import * as m from "../../paraglide/messages";
 import React from "react";
 import { Flex, Heading } from "@chakra-ui/react";
 import {
@@ -30,10 +31,10 @@ export const SelectorView = ({
       <TabsRoot defaultValue="tree" lazyMount unmountOnExit>
         <TabsList>
           <TabsTrigger value="tree" data-testid="view-tab-tree">
-            Tree View
+            {m.operations_tree_view()}
           </TabsTrigger>
           <TabsTrigger value="list" data-testid="view-tab-list">
-            List View
+            {m.operations_list_view()}
           </TabsTrigger>
         </TabsList>
 
@@ -48,7 +49,7 @@ export const SelectorView = ({
 
         <TabsContent value="list">
           <Heading size="md" mb={4}>
-            Backup Action History
+            {m.operations_history()}
           </Heading>
           <OperationListView
             req={create(GetOperationsRequestSchema, {

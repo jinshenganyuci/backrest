@@ -123,7 +123,7 @@ export const PlanView = ({ plan }: React.PropsWithChildren<{ plan: Plan }>) => {
               <IconButton
                 variant="subtle"
                 colorPalette="blue"
-                aria-label="More actions"
+                aria-label={m.ui_more_actions()}
               >
                 <FiChevronDown />
               </IconButton>

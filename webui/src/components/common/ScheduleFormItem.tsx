@@ -9,6 +9,8 @@ import {
   Schedule_ClockSchema,
 } from "../../../gen/ts/v1/config_pb";
 import cronstrue from "cronstrue";
+import "cronstrue/locales/zh_CN";
+import { getLocale } from "../../paraglide/runtime";
 import * as m from "../../paraglide/messages";
 
 interface ScheduleDefaults {
@@ -140,8 +142,10 @@ export const ScheduleFormItem = ({
               helperText={(() => {
                 try {
                   return schedule.cron
-                    ? cronstrue.toString(schedule.cron)
-                    : "Standard cron syntax (e.g. 0 0 * * *)";
+                    ? cronstrue.toString(schedule.cron, {
+                        locale: getLocale() === "zh" ? "zh_CN" : "en",
+                      })
+                    : m.schedule_cron_syntax();
                 } catch (e) {
                   return m.add_plan_modal_schedule_invalid_cron();
                 }

@@ -1,5 +1,7 @@
 "use client";
 
+import * as m from "../../paraglide/messages";
+
 import type { ButtonProps, GroupProps, InputProps } from "@chakra-ui/react";
 import {
   Box,
@@ -34,7 +36,7 @@ export const PasswordInput = React.forwardRef<
           {attach}
           <IconButton
             variant="ghost"
-            aria-label={visible ? "Hide password" : "Show password"}
+            aria-label={visible ? m.ui_hide_password() : m.ui_show_password()}
             onClick={() => {
               setVisible(!visible);
               inputRef.current?.focus();

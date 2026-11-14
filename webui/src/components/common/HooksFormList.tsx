@@ -92,17 +92,46 @@ const hookConditionDescriptions: Record<string, string> = {
   CONDITION_UNKNOWN: m.repo_hooks_command_runs_condition_unknown(),
 };
 
-const conditionOptions: EnumOption<string>[] = Hook_ConditionSchema.values.map(
+const hookConditionLabels: Record<string, () => string> = {
+  CONDITION_UNKNOWN: m.hook_condition_unknown,
+  CONDITION_ANY_ERROR: m.hook_condition_any_error,
+  CONDITION_SNAPSHOT_START: m.hook_condition_snapshot_start,
+  CONDITION_SNAPSHOT_END: m.hook_condition_snapshot_end,
+  CONDITION_SNAPSHOT_ERROR: m.hook_condition_snapshot_error,
+  CONDITION_SNAPSHOT_WARNING: m.hook_condition_snapshot_warning,
+  CONDITION_SNAPSHOT_SUCCESS: m.hook_condition_snapshot_success,
+  CONDITION_SNAPSHOT_SKIPPED: m.hook_condition_snapshot_skipped,
+  CONDITION_PRUNE_START: m.hook_condition_prune_start,
+  CONDITION_PRUNE_ERROR: m.hook_condition_prune_error,
+  CONDITION_PRUNE_SUCCESS: m.hook_condition_prune_success,
+  CONDITION_CHECK_START: m.hook_condition_check_start,
+  CONDITION_CHECK_ERROR: m.hook_condition_check_error,
+  CONDITION_CHECK_SUCCESS: m.hook_condition_check_success,
+  CONDITION_FORGET_START: m.hook_condition_forget_start,
+  CONDITION_FORGET_ERROR: m.hook_condition_forget_error,
+  CONDITION_FORGET_SUCCESS: m.hook_condition_forget_success,
+};
+
+const getConditionOptions = (): EnumOption<string>[] => Hook_ConditionSchema.values.map(
   (v) => ({
-    label: v.name,
+    label: hookConditionLabels[v.name]?.() ?? v.name,
     value: v.name,
     description: hookConditionDescriptions[v.name],
   }),
 );
 
-const onErrorOptions: EnumOption<string>[] = Hook_OnErrorSchema.values.map(
+const hookOnErrorLabels: Record<string, () => string> = {
+  ON_ERROR_IGNORE: m.hook_on_error_ignore,
+  ON_ERROR_CANCEL: m.hook_on_error_cancel,
+  ON_ERROR_FATAL: m.hook_on_error_fatal,
+  ON_ERROR_RETRY_1MINUTE: m.hook_on_error_retry_1minute,
+  ON_ERROR_RETRY_10MINUTES: m.hook_on_error_retry_10minutes,
+  ON_ERROR_RETRY_EXPONENTIAL_BACKOFF: m.hook_on_error_retry_exponential_backoff,
+};
+
+const getOnErrorOptions = (): EnumOption<string>[] => Hook_OnErrorSchema.values.map(
   (v) => ({
-    label: v.name,
+    label: hookOnErrorLabels[v.name]?.() ?? v.name,
     value: v.name,
   }),
 );
@@ -222,14 +251,14 @@ const HookItem = ({
       <Card.Header pb={2}>
         <Flex align="center" justify="space-between">
           <Text fontWeight="bold">
-            Hook {index + 1}: {typeName}
+            {m.hook_heading({ number: index + 1, type: typeName })}
           </Text>
           <IconButton
             size="xs"
             variant="ghost"
             colorPalette="red"
             onClick={onRemove}
-            aria-label="Remove hook"
+            aria-label={m.hook_remove()}
             data-testid="hook-remove"
           >
             <FiTrash2 />
@@ -241,7 +270,7 @@ const HookItem = ({
           <Box width="full" data-testid="hook-conditions">
             <EnumSelector
               multiSelect
-              options={conditionOptions}
+              options={getConditionOptions()}
               value={hook.conditions}
               onChange={handleConditionChange}
               placeholder={m.repo_hooks_command_runs_when()}
@@ -320,7 +349,7 @@ const hookTypes: {
       return (
         <Stack gap={2}>
           <Input
-            placeholder="Shoutrrr URL"
+            placeholder={m.hook_shoutrrr_url()}
             value={hook.actionShoutrrr?.shoutrrrUrl || ""}
             onChange={(e) => updateShoutrrr("shoutrrrUrl", e.target.value)}
             size="sm"
@@ -358,7 +387,7 @@ const hookTypes: {
       return (
         <Stack gap={2}>
           <Input
-            placeholder="Discord Webhook URL"
+            placeholder={m.hook_discord_url()}
             value={hook.actionDiscord?.webhookUrl || ""}
             onChange={(e) => updateDiscord("webhookUrl", e.target.value)}
             size="sm"
@@ -400,19 +429,19 @@ const hookTypes: {
       return (
         <Stack gap={2}>
           <Input
-            placeholder="Gotify Base URL"
+            placeholder={m.hook_gotify_url()}
             value={hook.actionGotify?.baseUrl || ""}
             onChange={(e) => updateGotify("baseUrl", e.target.value)}
             size="sm"
           />
           <Input
-            placeholder="Gotify Token"
+            placeholder={m.hook_gotify_token()}
             value={hook.actionGotify?.token || ""}
             onChange={(e) => updateGotify("token", e.target.value)}
             size="sm"
           />
           <Input
-            placeholder="Title Template"
+            placeholder={m.hook_title_template()}
             value={hook.actionGotify?.titleTemplate || ""}
             onChange={(e) => updateGotify("titleTemplate", e.target.value)}
             size="sm"
@@ -428,11 +457,11 @@ const hookTypes: {
           />
           <EnumSelector
             options={[
-              { label: "0 - No notification", value: "0" },
-              { label: "1 - Icon in notification bar", value: "1" },
-              { label: "4 - Icon in notification bar + Sound", value: "4" },
+              { label: m.hook_priority_none(), value: "0" },
+              { label: m.hook_priority_icon(), value: "1" },
+              { label: m.hook_priority_sound(), value: "4" },
               {
-                label: "8 - Icon in notification bar + Sound + Vibration",
+                label: m.hook_priority_vibration(),
                 value: "8",
               },
             ]}
@@ -440,7 +469,7 @@ const hookTypes: {
             onChange={(val) =>
               updateGotify("priority", parseInt(val as string))
             }
-            placeholder="Priority"
+            placeholder={m.hook_priority()}
             size="sm"
           />
         </Stack>
@@ -467,7 +496,7 @@ const hookTypes: {
       return (
         <Stack gap={2}>
           <Input
-            placeholder="Slack Webhook URL"
+            placeholder={m.hook_slack_url()}
             value={hook.actionSlack?.webhookUrl || ""}
             onChange={(e) => updateSlack("webhookUrl", e.target.value)}
             size="sm"
@@ -505,7 +534,7 @@ const hookTypes: {
       return (
         <Stack gap={2}>
           <Input
-            placeholder="Ping URL"
+            placeholder={m.hook_ping_url()}
             value={hook.actionHealthchecks?.webhookUrl || ""}
             onChange={(e) => updateHealthchecks("webhookUrl", e.target.value)}
             size="sm"
@@ -544,13 +573,13 @@ const hookTypes: {
       return (
         <Stack gap={2}>
           <Input
-            placeholder="Bot Token"
+            placeholder={m.hook_bot_token()}
             value={hook.actionTelegram?.botToken || ""}
             onChange={(e) => updateTelegram("botToken", e.target.value)}
             size="sm"
           />
           <Input
-            placeholder="Chat ID"
+            placeholder={m.hook_chat_id()}
             value={hook.actionTelegram?.chatId || ""}
             onChange={(e) => updateTelegram("chatId", e.target.value)}
             size="sm"
@@ -572,14 +601,14 @@ const hookTypes: {
 
 const findHookTypeName = (field: HookFields): string => {
   if (!field) {
-    return "Unknown";
+    return m.ui_unknown();
   }
   for (const hookType of hookTypes) {
     if (hookType.oneofKey in field) {
       return hookType.name;
     }
   }
-  return "Unknown";
+  return m.ui_unknown();
 };
 
 const HookBuilder = ({
@@ -590,7 +619,7 @@ const HookBuilder = ({
   onChange: (h: HookFields) => void;
 }) => {
   if (!hook) {
-    return <Text>Unknown hook type</Text>;
+    return <Text>{m.hook_unknown()}</Text>;
   }
 
   for (const hookType of hookTypes) {
@@ -599,7 +628,7 @@ const HookBuilder = ({
     }
   }
 
-  return <Text>Unknown hook type</Text>;
+  return <Text>{m.hook_unknown()}</Text>;
 };
 
 const ItemOnErrorSelector = ({
@@ -632,13 +661,13 @@ const ItemOnErrorSelector = ({
             </Box>
           }
         >
-          <IconButton aria-label="info" size="xs" variant="ghost">
+          <IconButton aria-label={m.ui_info_label()} size="xs" variant="ghost">
             <FiInfo />
           </IconButton>
         </Tooltip>
       </Flex>
       <EnumSelector
-        options={onErrorOptions}
+        options={getOnErrorOptions()}
         value={hook.onError || ""}
         onChange={(val) => onChange({ ...hook, onError: val as string })}
         placeholder={m.repo_hooks_command_error_tooltip()}

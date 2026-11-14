@@ -1,3 +1,4 @@
+import * as m from "../../paraglide/messages";
 import React, { useEffect, useState } from "react";
 import {
   LogDataRequest,
@@ -53,7 +54,7 @@ export const LogView = ({ logref }: { logref: string }) => {
           e.name !== "AbortError" &&
           !e.message?.includes("signal is aborted without reason")
         ) {
-          setError(e.message || "Failed to fetch logs");
+          setError(e.message || m.logs_fetch_failed());
         }
       } finally {
         setLoading(false);
@@ -85,7 +86,7 @@ export const LogView = ({ logref }: { logref: string }) => {
     >
       {error && (
         <Text color="fg.error" mb={2} fontWeight="bold">
-          Error: {error}
+          {m.logs_error_prefix()} {error}
         </Text>
       )}
 
@@ -112,8 +113,7 @@ export const LogView = ({ logref }: { logref: string }) => {
             onClick={() => setLimit(limit * 10)}
             mt={2}
           >
-            Show {Math.min(limit * 9, lines.length - limit)} more lines out of{" "}
-            {lines.length} available...
+            {m.logs_show_more({ count: Math.min(limit * 9, lines.length - limit), total: lines.length })}
           </Button>
         </>
       ) : null}

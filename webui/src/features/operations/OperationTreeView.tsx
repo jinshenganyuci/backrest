@@ -1,3 +1,4 @@
+import * as m from "../../paraglide/messages";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Box,
@@ -172,9 +173,9 @@ export const OperationTreeView = ({
             <LuInfo />
           </EmptyState.Indicator>
           <VStack textAlign="center">
-            <EmptyState.Title>No operations found</EmptyState.Title>
+            <EmptyState.Title>{m.operations_none()}</EmptyState.Title>
             <EmptyState.Description>
-              There are no operations to display.
+              {m.operations_none_description()}
             </EmptyState.Description>
           </VStack>
         </EmptyState.Content>
@@ -398,7 +399,7 @@ const DisplayOperationTree = React.memo(
         nodeToString: (node: OpTreeNode) => node.label,
         rootNode: {
           id: "ROOT",
-          label: "Root",
+          label: m.operations_root(),
           children: nodes,
         },
       });
@@ -554,7 +555,7 @@ const BackupView = ({ backup }: { backup?: FlowDisplayInfo }) => {
   if (!backup) {
     return (
       <EmptyState.Root>
-        <EmptyState.Title>Backup not found.</EmptyState.Title>
+        <EmptyState.Title>{m.operations_backup_not_found()}</EmptyState.Title>
       </EmptyState.Root>
     );
   } else {
@@ -567,9 +568,9 @@ const BackupView = ({ backup }: { backup?: FlowDisplayInfo }) => {
             snapshotId: backup.snapshotID!,
           }),
         );
-        alerts.success("Snapshot forget scheduled.");
+        alerts.success(m.operations_forget_scheduled());
       } catch (e: any) {
-        alerts.error("Failed to forget snapshot: " + e);
+        alerts.error(m.operations_forget_failed({ error: String(e) }));
       }
     };
 
@@ -581,18 +582,18 @@ const BackupView = ({ backup }: { backup?: FlowDisplayInfo }) => {
       snapshotInFlow && snapshotInFlow.snapshotId ? (
         <ConfirmButton
           variant="ghost"
-          confirmTitle="Confirm forget?"
+          confirmTitle={m.operations_forget_confirm()}
           confirmTimeout={2000}
           onClickAsync={doDeleteSnapshot}
           colorPalette="red"
           data-testid="forget-snapshot"
         >
-          Forget (Destructive)
+          {m.operations_forget_destructive()}
         </ConfirmButton>
       ) : (
         <ConfirmButton
           variant="ghost"
-          confirmTitle="Confirm clear?"
+          confirmTitle={m.operations_clear_confirm()}
           onClickAsync={async () => {
             backrestService.clearHistory(
               create(ClearHistoryRequestSchema, {
@@ -603,7 +604,7 @@ const BackupView = ({ backup }: { backup?: FlowDisplayInfo }) => {
             );
           }}
         >
-          Delete Event
+          {m.operations_delete_event()}
         </ConfirmButton>
       );
 

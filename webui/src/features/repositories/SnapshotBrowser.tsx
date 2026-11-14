@@ -1,3 +1,4 @@
+import * as m from "../../paraglide/messages";
 import React, { useEffect, useMemo, useState } from "react";
 import {
   ListSnapshotFilesRequestSchema,
@@ -222,7 +223,7 @@ export const SnapshotBrowser = ({
         });
       });
     } catch (e: any) {
-      alerts.error("Failed to load snapshot files: " + e.message);
+      alerts.error(m.snapshot_load_failed({ error: e.message }));
     } finally {
       setLoadingKeys((prev) => {
         const next = new Set(prev);
@@ -239,7 +240,7 @@ export const SnapshotBrowser = ({
 
       rootNode: {
         key: "root",
-        title: "root",
+        title: m.operations_root(),
         children: treeData,
         entry: create(LsEntrySchema, {}),
         isLeaf: false,
@@ -328,14 +329,14 @@ const FileNode = ({
         window.open(resp.value, "_blank");
       })
       .catch((e) => {
-        alerts.error("Failed to fetch download URL: " + e.message);
+        alerts.error(m.snapshot_download_failed({ error: e.message }));
       });
   };
 
   const showInfo = () => {
     showModal(
       <FormModal
-        title={"Path Info for " + entry.path}
+        title={m.snapshot_path_info({ path: entry.path })}
         isOpen={true}
         onClose={() => showModal(null)}
         footer={null}
@@ -390,7 +391,7 @@ const FileNode = ({
             <MenuItem value="info" onClick={showInfo}>
               <FiInfo />
               {/* @ts-ignore */}
-              <MenuItemText>Info</MenuItemText>
+              <MenuItemText>{m.ui_info()}</MenuItemText>
             </MenuItem>
             {/* @ts-ignore */}
             <MenuItem
@@ -400,7 +401,7 @@ const FileNode = ({
             >
               <FiRefreshCw />
               {/* @ts-ignore */}
-              <MenuItemText>Restore to path</MenuItemText>
+              <MenuItemText>{m.restore_to_path()}</MenuItemText>
             </MenuItem>
             {snapshotOpId ? (
               // @ts-ignore
@@ -411,7 +412,7 @@ const FileNode = ({
               >
                 <FiDownload />
                 {/* @ts-ignore */}
-                <MenuItemText>Download</MenuItemText>
+                <MenuItemText>{m.ui_download()}</MenuItemText>
               </MenuItem>
             ) : null}
           </MenuContent>
@@ -470,46 +471,43 @@ const RestoreModal = ({
           target,
         }),
       );
-      alerts.success("Restore started successfully.");
+      alerts.success(m.restore_started());
       showModal(null);
     } catch (e: any) {
-      alerts.error("Failed to restore: " + e.message);
+      alerts.error(m.restore_failed({ error: e.message }));
     }
   };
 
   return (
     <FormModal
-      title={"Restore " + path}
+      title={m.restore_title({ path })}
       isOpen={true}
       onClose={() => showModal(null)}
       footer={
         <>
           <Button variant="ghost" onClick={() => showModal(null)}>
-            Cancel
+            {m.button_cancel()}
           </Button>
           <ConfirmButton
             onClickAsync={handleOk}
-            confirmTitle="Confirm Restore?"
+            confirmTitle={m.restore_confirm()}
           >
-            Restore
+            {m.ui_restore()}
           </ConfirmButton>
         </>
       }
     >
       <Stack gap={4}>
         <Text>
-          If restoring to a specific path, ensure that the path does not already
-          exist or that you are comfortable overwriting the data at that
-          location.
+          {m.restore_overwrite_hint()}
         </Text>
         <Text>
-          You may set the path to an empty string to restore to your Downloads
-          folder.
+          {m.restore_downloads_hint()}
         </Text>
 
-        <Field label="Restore to path" errorText={error}>
+        <Field label={m.restore_to_path()} errorText={error}>
           <URIAutocomplete
-            placeholder="Restoring to Downloads"
+            placeholder={m.restore_downloads_placeholder()}
             value={target}
             onChange={(val: string) => setTarget(val || "")}
           />

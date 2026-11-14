@@ -1,3 +1,4 @@
+import * as m from "../../paraglide/messages";
 import React from "react";
 import {
   SelectRoot,
@@ -35,7 +36,7 @@ export const EnumSelector = <T extends string>({
   onChange,
   options,
   multiSelect = false,
-  placeholder = "Select...",
+  placeholder = m.ui_select(),
   size = "sm",
   ariaLabel,
 }: EnumSelectorProps<T>) => {

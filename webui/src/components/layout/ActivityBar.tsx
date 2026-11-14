@@ -1,3 +1,4 @@
+import * as m from "../../paraglide/messages";
 import { useEffect, useState } from "react";
 import { operationsStream } from "../../api/oplog";
 import { formatDuration } from "../../lib/formatting";
@@ -57,8 +58,7 @@ export const ActivityBar = () => {
 
         return (
           <span key={idx} style={{ marginRight: "2em" }}>
-            {displayName} in progress for plan {op.planId} to {op.repoId} for{" "}
-            {formatDuration(Date.now() - Number(op.unixTimeStartMs))}
+            {m.activity_in_progress({ operation: displayName, plan: op.planId, repo: op.repoId, duration: formatDuration(Date.now() - Number(op.unixTimeStartMs)) })}
           </span>
         );
       })}

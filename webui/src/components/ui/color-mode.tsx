@@ -1,5 +1,7 @@
 "use client";
 
+import * as m from "../../paraglide/messages";
+
 import type { IconButtonProps } from "@chakra-ui/react";
 import { ClientOnly, IconButton, Skeleton } from "@chakra-ui/react";
 import { ThemeProvider, useTheme } from "next-themes";
@@ -44,7 +46,7 @@ export const ColorModeButton = React.forwardRef<
       <IconButton
         onClick={toggleColorMode}
         variant="ghost"
-        aria-label="Toggle color mode"
+        aria-label={m.ui_toggle_color_mode()}
         size="sm"
         ref={ref}
         {...props}

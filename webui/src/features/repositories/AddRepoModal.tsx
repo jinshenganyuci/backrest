@@ -185,15 +185,12 @@ const isHostKeyError = (message: string | undefined): boolean => {
   );
 };
 
-const hostKeyUntrustedContent = (
+const HostKeyUntrustedContent = () => (
   <>
-    The host key for this SFTP server is not known or does not match the
-    recorded key, so Backrest will not connect.
+    {m.sftp_host_untrusted()}
     <br />
     <br />
-    To proceed, manually add the correct host key to your known_hosts file, or
-    use the "Setup SSH Key" section below to generate a key and scan the host
-    key automatically.
+    {m.sftp_host_untrusted_help()}
   </>
 );
 
@@ -260,9 +257,9 @@ const SftpConfigSection = ({
       if (res.error) {
         setHostKeyWarning(res.error);
       }
-      alerts.success("Generated SSH keypair at " + res.keyPath);
+      alerts.success(m.sftp_keypair_path({ path: res.keyPath }));
     } catch (e: any) {
-      alerts.error(formatErrorAlert(e, "SFTP Setup Failed"));
+      alerts.error(formatErrorAlert(e, m.sftp_setup_failed()));
     } finally {
       setSetupLoading(false);
     }
@@ -274,16 +271,12 @@ const SftpConfigSection = ({
         <AccordionRoot collapsible variant="enclosed">
           <AccordionItem value="bootstrap">
             <AccordionItemTrigger>
-              Setup SSH Key (Optional)
+              {m.sftp_setup_key()}
             </AccordionItemTrigger>
             <AccordionItemContent>
               <Stack gap={3} p={2}>
                 <CText fontSize="sm">
-                  Click "Generate Key" to create an SSH key pair for this host.
-                  Backrest will attempt to scan the host key into known_hosts
-                  automatically. You will then need to add the generated public
-                  key to <Code>~/.ssh/authorized_keys</Code> on the remote
-                  server.
+                  {m.sftp_setup_help_prefix()} <Code>~/.ssh/authorized_keys</Code> {m.sftp_setup_help_suffix()}
                 </CText>
                 <Button
                   size="sm"
@@ -291,7 +284,7 @@ const SftpConfigSection = ({
                   loading={setupLoading}
                   data-testid="add-repo-sftp-generate-key"
                 >
-                  Generate Key
+                  {m.sftp_generate_key()}
                 </Button>
               </Stack>
             </AccordionItemContent>
@@ -303,11 +296,11 @@ const SftpConfigSection = ({
         <Box p={4} borderWidth={1} borderRadius="md" bg="bg.subtle">
           <Stack gap={2}>
             <CText fontWeight="bold" color="green.500">
-              Key Generated Successfully!
+              {m.sftp_key_generated()}
             </CText>
             <CText fontSize="sm">
-              Add the following public key to{" "}
-              <Code>~/.ssh/authorized_keys</Code> on the remote server:
+              {m.sftp_authorize_prefix()}{" "}
+              <Code>~/.ssh/authorized_keys</Code> {m.sftp_authorize_suffix()}
             </CText>
             <Box position="relative">
               <Code
@@ -328,7 +321,7 @@ const SftpConfigSection = ({
                   }}
                   colorPalette={keyCopied ? "green" : undefined}
                 >
-                  {keyCopied ? "Copied!" : "Copy"}
+                  {keyCopied ? m.ui_copied() : m.ui_copy()}
                 </Button>
               </Box>
             </Box>
@@ -341,7 +334,7 @@ const SftpConfigSection = ({
                 bg="yellow.subtle"
               >
                 <CText fontSize="sm" color="yellow.700">
-                  <strong>Host key scan failed:</strong> {hostKeyWarning}
+                  <strong>{m.sftp_host_scan_failed()}</strong> {hostKeyWarning}
                 </CText>
               </Box>
             )}
@@ -350,8 +343,8 @@ const SftpConfigSection = ({
       )}
 
       <Field
-        label="SFTP Identity File"
-        helperText="Optional: Path to an SSH identity file for SFTP authentication. This path must be accessible on the machine running backrest."
+        label={m.sftp_identity_file()}
+        helperText={m.sftp_identity_help()}
       >
         <Input
           data-testid="add-repo-sftp-identity"
@@ -362,8 +355,8 @@ const SftpConfigSection = ({
       </Field>
 
       <Field
-        label="SFTP Port"
-        helperText="Optional: Specify a custom port for SFTP connection. Defaults to 22."
+        label={m.sftp_port()}
+        helperText={m.sftp_port_help()}
       >
         <NumberInputField
           data-testid="add-repo-sftp-port"
@@ -376,8 +369,8 @@ const SftpConfigSection = ({
       </Field>
 
       <Field
-        label="Known Hosts File"
-        helperText="Optional: Path to a known_hosts file for host key verification. Populated automatically by Setup Keys."
+        label={m.sftp_known_hosts()}
+        helperText={m.sftp_known_hosts_help()}
       >
         <Input
           data-testid="add-repo-sftp-known-hosts"
@@ -614,8 +607,8 @@ export const AddRepoModal = ({
         if (isHostKeyError(e.message)) {
           setConfirmation({
             open: true,
-            title: "Unknown SFTP Host Key",
-            content: hostKeyUntrustedContent,
+            title: m.sftp_unknown_host_key(),
+            content: <HostKeyUntrustedContent />,
             onOk: () => {
               setConfirmation((prev) => ({ ...prev, open: false }));
             },
@@ -650,8 +643,8 @@ export const AddRepoModal = ({
         if (response.hostKeyUntrusted || isHostKeyError(response.error)) {
           setConfirmation({
             open: true,
-            title: "Unknown SFTP Host Key",
-            content: hostKeyUntrustedContent,
+            title: m.sftp_unknown_host_key(),
+            content: <HostKeyUntrustedContent />,
             onOk: () => {
               setConfirmation((prev) => ({ ...prev, open: false }));
             },
@@ -686,51 +679,51 @@ export const AddRepoModal = ({
 
   const ioNiceOptions: EnumOption<string>[] = [
     {
-      label: "IO_BEST_EFFORT_LOW",
+      label: m.repo_priority_io_best_effort_low(),
       value: "IO_BEST_EFFORT_LOW",
       description: m.add_repo_modal_field_io_priority_low(),
     },
     {
-      label: "IO_BEST_EFFORT_HIGH",
+      label: m.repo_priority_io_best_effort_high(),
       value: "IO_BEST_EFFORT_HIGH",
       description: m.add_repo_modal_field_io_priority_high(),
     },
     {
-      label: "IO_IDLE",
+      label: m.repo_priority_io_idle(),
       value: "IO_IDLE",
       description: m.add_repo_modal_field_io_priority_idle(),
     },
     {
-      label: "IO_DEFAULT",
+      label: m.repo_priority_io_default(),
       value: "IO_DEFAULT",
-      description: "Default system priority",
+      description: m.repo_io_default_description(),
     },
   ];
 
   const cpuNiceOptions: EnumOption<string>[] = [
     {
-      label: "CPU_DEFAULT",
+      label: m.repo_priority_cpu_default(),
       value: "CPU_DEFAULT",
       description: m.add_repo_modal_field_cpu_priority_default(),
     },
     {
-      label: "CPU_HIGH",
+      label: m.repo_priority_cpu_high(),
       value: "CPU_HIGH",
       description: m.add_repo_modal_field_cpu_priority_high(),
     },
     {
-      label: "CPU_LOW",
+      label: m.repo_priority_cpu_low(),
       value: "CPU_LOW",
       description: m.add_repo_modal_field_cpu_priority_low(),
     },
   ];
 
   const sections: SectionDef[] = [
-    { id: "identity", label: "Identity", icon: <FiTag size={14} /> },
-    { id: "connection", label: "Connection", icon: <FiLink size={14} /> },
-    { id: "scheduling", label: "Scheduling", icon: <FiClock size={14} /> },
-    { id: "hooks", label: "Hooks", icon: <FiZap size={14} /> },
-    { id: "advanced", label: "Advanced", icon: <FiSliders size={14} /> },
+    { id: "identity", label: m.ui_identity(), icon: <FiTag size={14} /> },
+    { id: "connection", label: m.ui_connection(), icon: <FiLink size={14} /> },
+    { id: "scheduling", label: m.ui_scheduling(), icon: <FiClock size={14} /> },
+    { id: "hooks", label: m.ui_hooks(), icon: <FiZap size={14} /> },
+    { id: "advanced", label: m.ui_advanced(), icon: <FiSliders size={14} /> },
   ];
 
   const footer = (
@@ -788,9 +781,9 @@ export const AddRepoModal = ({
           <DialogBody>{confirmation.content}</DialogBody>
           <DialogFooter>
             <DialogActionTrigger asChild>
-              <Button variant="outline">Cancel</Button>
+              <Button variant="outline">{m.button_cancel()}</Button>
             </DialogActionTrigger>
-            <Button onClick={confirmation.onOk}>Confirm</Button>
+            <Button onClick={confirmation.onOk}>{m.ui_confirm()}</Button>
           </DialogFooter>
           <DialogCloseTrigger />
         </DialogContent>
@@ -823,9 +816,8 @@ export const AddRepoModal = ({
               pointerEvents="auto"
             >
               <CText fontSize="sm">
-                This repository is managed by remote instance{" "}
-                <strong>{template?.originInstanceId}</strong> and cannot be
-                edited. You may delete it to remove the local copy.
+                {m.repo_remote_managed_prefix()}{" "}
+                <strong>{template?.originInstanceId}</strong> {m.repo_remote_managed_suffix()}
               </CText>
             </Box>
           )}
@@ -834,8 +826,8 @@ export const AddRepoModal = ({
           <TwoPaneSection id="identity">
             <SectionCard
               icon={<FiTag size={16} />}
-              title="Identity"
-              description="Display name, identifiers, and unlock behaviour."
+              title={m.ui_identity()}
+              description={m.repo_identity_description()}
             >
               <Stack gap={4}>
                 <Field
@@ -879,8 +871,8 @@ export const AddRepoModal = ({
                 <ToggleField
                   checked={getField(["shared"]) || false}
                   onChange={(v) => updateField(["shared"], v)}
-                  label="Shared"
-                  hint="If using multihost management, enables sharing this repo's configuration to all authorized clients with read permission."
+                  label={m.repo_shared()}
+                  hint={m.repo_shared_hint()}
                 />
                 {getField(["shared"]) && (
                   <CText fontSize="sm" color="orange.500">
@@ -895,8 +887,8 @@ export const AddRepoModal = ({
           <TwoPaneSection id="connection">
             <SectionCard
               icon={<FiLink size={16} />}
-              title="Connection"
-              description="Where the repo lives and how Backrest authenticates."
+              title={m.ui_connection()}
+              description={m.repo_connection_description()}
             >
               <Stack gap={4}>
                 <Field
@@ -1010,7 +1002,7 @@ export const AddRepoModal = ({
           <TwoPaneSection id="scheduling">
             <SectionCard
               icon={<FiClock size={16} />}
-              title="Prune Policy"
+              title={m.repo_prune_policy()}
               description={m.add_repo_modal_field_prune_policy_help()}
             >
               <Stack gap={4}>
@@ -1040,7 +1032,7 @@ export const AddRepoModal = ({
 
             <SectionCard
               icon={<FiClock size={16} />}
-              title="Check Policy"
+              title={m.repo_check_policy()}
               description={m.add_repo_modal_field_check_policy_help()}
             >
               <Stack gap={4}>
@@ -1105,8 +1097,8 @@ export const AddRepoModal = ({
           <TwoPaneSection id="hooks">
             <SectionCard
               icon={<FiZap size={16} />}
-              title="Hooks"
-              description="Run commands or send notifications on operation events."
+              title={m.ui_hooks()}
+              description={m.repo_hooks_description()}
             >
               <Field
                 label={m.add_plan_modal_field_hooks()}
@@ -1124,8 +1116,8 @@ export const AddRepoModal = ({
           <TwoPaneSection id="advanced">
             <SectionCard
               icon={<FiSliders size={16} />}
-              title="Advanced"
-              description="Command priority, extra flags, and raw restic options."
+              title={m.ui_advanced()}
+              description={m.repo_advanced_description()}
             >
               <Stack gap={4} width="full">
                 {!isWindows && (
@@ -1296,10 +1288,7 @@ const checkSchemeEnvVars = async (
   }
 
   throw new Error(
-    "Missing env vars " +
-      formatMissingEnvVars(missingVarsCollection) +
-      " for scheme " +
-      scheme,
+    m.repo_env_missing({ variables: formatMissingEnvVars(missingVarsCollection), scheme }),
   );
 };
 
@@ -1311,7 +1300,7 @@ const formatMissingEnvVars = (partialMatches: string[][]): string => {
       }
       return x[0];
     })
-    .join(" or ");
+    .join(m.ui_or_separator());
 };
 
 const EnvVarTooltip = ({ uri }: { uri: string }) => {
@@ -1322,12 +1311,12 @@ const EnvVarTooltip = ({ uri }: { uri: string }) => {
   return (
     <Box mt={2} p={2} bg="bg.muted" borderRadius="md" borderWidth="1px">
       <CText fontWeight="bold" mb={1}>
-        Recommended for {scheme}:
+        {m.repo_env_recommended({ scheme })}
       </CText>
       <ul style={{ paddingLeft: "1.2em" }}>
         {expected.map((set, i) => (
           <li key={i}>
-            {i > 0 && "or "}
+            {i > 0 && m.ui_or_prefix()}
             {set.join(" + ")}
           </li>
         ))}

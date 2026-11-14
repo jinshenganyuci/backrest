@@ -161,9 +161,8 @@ const RepoViewContainer = () => {
                 color: "blue.200",
               }}
             >
-              This is a remote repo from{" "}
-              <strong>{repo.originInstanceId}</strong>. Operation history only
-              includes backups run locally and may be incomplete.
+              {m.app_remote_repo_prefix()}{" "}
+              <strong>{repo.originInstanceId}</strong>{m.app_remote_repo_suffix()}
             </Box>
           )}
           <RepoView repo={repo} />
@@ -738,7 +737,7 @@ const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
                   pt={2}
                   pb={1}
                 >
-                  Remote
+                  {m.ui_remote()}
                 </Text>
                 {remoteRepos.map((repo) => (
                   <SidebarRepoItem
@@ -790,7 +789,7 @@ const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
                             repos: [updatedRepo],
                           }),
                         );
-                        alerts.success("Remote repo updated");
+                        alerts.success(m.app_remote_repo_updated());
                       }}
                     />,
                   );
@@ -810,7 +809,7 @@ const SidebarContent = ({ onClose }: { onClose?: () => void }) => {
                             plans: [updatedPlan],
                           }),
                         );
-                        alerts.success("Remote plan updated");
+                        alerts.success(m.app_remote_plan_updated());
                       }}
                     />,
                   );
@@ -1015,7 +1014,7 @@ const MobileNavTrigger = () => {
       onOpenChange={(e) => setOpen(e.open)}
     >
       <DrawerTrigger asChild>
-        <IconButton variant="ghost" size="sm" color="white" aria-label="Menu">
+        <IconButton variant="ghost" size="sm" color="white" aria-label={m.ui_menu()}>
           <FiMenu />
         </IconButton>
       </DrawerTrigger>
@@ -1058,7 +1057,7 @@ export const AuthenticationBoundary = ({
           setTimeout(
             () =>
               reject(
-                new Error("Request timed out, backend may be unavailable"),
+                new Error(m.app_request_timeout()),
               ),
             10000,
           ),
@@ -1116,11 +1115,11 @@ export const AuthenticationBoundary = ({
   if (error && !config) {
     return (
       <EmptyState
-        title="Failed to load configuration"
+        title={m.app_config_load_failed()}
         description={error}
         icon={<FiAlertTriangle />}
       >
-        <Button onClick={() => loadConfig()}>Retry</Button>
+        <Button onClick={() => loadConfig()}>{m.ui_retry()}</Button>
       </EmptyState>
     );
   }
